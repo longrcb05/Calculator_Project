@@ -17,14 +17,27 @@ public class CalculatorForm extends javax.swing.JFrame {
     String operator = ""; // Lưu trữ các toán như như +, -, *, /
     boolean isEqualsPress = false;
     List<String> history = new ArrayList<>(); // Lưu trữ lsu tính toán
-
+    private final String HISTORY_FILE = "history.txt";
     /**
      * Creates new form CalculatorForm
      */
     public CalculatorForm() {
         initComponents(); // Khởi tạo giao diện
+        loadHistoryFromFile();
     }
-
+    
+     private void loadHistoryFromFile() {
+    try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(HISTORY_FILE))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            history.add(line);
+        }
+        updateHistory();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -67,7 +80,8 @@ public class CalculatorForm extends javax.swing.JFrame {
         btnTan = new javax.swing.JButton();
         btnCot = new javax.swing.JButton();
         btnDoRadian = new javax.swing.JButton();
-        txtHistory = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtHistory = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -330,12 +344,9 @@ public class CalculatorForm extends javax.swing.JFrame {
         });
         jPanel2.add(btnDoRadian);
 
-        txtHistory.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        txtHistory.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtHistory(evt);
-            }
-        });
+        txtHistory.setColumns(20);
+        txtHistory.setRows(5);
+        jScrollPane1.setViewportView(txtHistory);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -344,9 +355,9 @@ public class CalculatorForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtHistory)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(255, 255, 255)
@@ -363,7 +374,7 @@ public class CalculatorForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtHistory, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -416,6 +427,14 @@ public class CalculatorForm extends javax.swing.JFrame {
         txtResult.setText("");
     }//GEN-LAST:event_btnMultiply
 
+        private void appendToHistoryFile(String entry) {
+    try (java.io.FileWriter fw = new java.io.FileWriter(HISTORY_FILE, true)) {
+        fw.write(entry + "\n");
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    }   
+        
     private void btnEqualsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualsActionPerformed
         if (txtResult.getText().equals("") || operandl.equals("")) {
             return;
@@ -444,7 +463,7 @@ public class CalculatorForm extends javax.swing.JFrame {
             String historyEntry = operandl + " " + operator + " " + oprand2 + " = " + result;
             history.add(historyEntry);
             updateHistory();
-
+            appendToHistoryFile(historyEntry);
             txtResult.setText("" + result);
             isEqualsPress = true;
         } catch (NumberFormatException e) {
@@ -521,12 +540,6 @@ public class CalculatorForm extends javax.swing.JFrame {
            // Cập nhật lại ô kết quả bằng cách xóa kí tự cuối cùng 
         }
     }//GEN-LAST:event_btnBackSPbtnSquareRootActionPerformed
-
-    private void txtHistory(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHistory
-        // TODO add your handling code here:
-        txtHistory.setEditable(false);
-        // Đặt ô lịch sử chỉ để đọc, không cho người dùng nhập hay chính sửa
-    }//GEN-LAST:event_txtHistory
 
     private void btnGiaiThuabtnSquareRootActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGiaiThuabtnSquareRootActionPerformed
         // TODO add your handling code here:
@@ -707,7 +720,8 @@ public class CalculatorForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextField txtHistory;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea txtHistory;
     private javax.swing.JTextField txtResult;
     // End of variables declaration//GEN-END:variables
 }
