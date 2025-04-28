@@ -80,8 +80,11 @@ public class CalculatorForm extends javax.swing.JFrame {
         btnTan = new javax.swing.JButton();
         btnCot = new javax.swing.JButton();
         btnDoRadian = new javax.swing.JButton();
+        btnDelete = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtHistory = new javax.swing.JTextArea();
+        txtSearch = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -344,9 +347,30 @@ public class CalculatorForm extends javax.swing.JFrame {
         });
         jPanel2.add(btnDoRadian);
 
+        btnDelete.setText("Delete History");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnDelete);
+
         txtHistory.setColumns(20);
         txtHistory.setRows(5);
         jScrollPane1.setViewportView(txtHistory);
+
+        txtSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
+            }
+        });
+
+        btnSearch.setText("Search");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -357,19 +381,31 @@ public class CalculatorForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(96, 96, 96)
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(255, 255, 255)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(11, 11, 11)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                                .addGap(1, 1, 1))
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -644,6 +680,61 @@ public class CalculatorForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnDoRadianbtnSquareRootActionPerformed
 
+    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchActionPerformed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        String keyword = txtSearch.getText().trim();
+        if (keyword.isEmpty()) {
+            updateHistory(); // Nếu ô tìm kiếm rỗng, hiện lại toàn bộ lịch sử
+            return;
+        }
+
+        StringBuilder searchResult = new StringBuilder();
+        for (String entry : history) {
+            if (entry.contains(keyword)) {
+                searchResult.append(entry).append("\n");
+            }
+        }
+
+        if (searchResult.length() == 0) {
+            txtHistory.setText("Không tìm thấy kết quả nào.");
+        } else {
+            txtHistory.setText(searchResult.toString());
+        }
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+     private void saveHistoryToFile() {
+    try (java.io.FileWriter fw = new java.io.FileWriter(HISTORY_FILE)) {
+        for (String entry : history) {
+            fw.write(entry + "\n");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+     
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        // TODO add your handling code here:
+        String selectedText = txtHistory.getSelectedText();
+        if (selectedText == null || selectedText.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Hãy chọn 1 dòng lịch sử để xóa!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Xác nhận
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa dòng này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        history.removeIf(entry -> entry.trim().equals(selectedText.trim()));
+        updateHistory();
+        saveHistoryToFile(); // Ghi lại file mới
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
     private void updateHistory() {
         StringBuilder historyText = new StringBuilder();
         for (String entry : history) {
@@ -693,6 +784,7 @@ public class CalculatorForm extends javax.swing.JFrame {
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnCos;
     private javax.swing.JButton btnCot;
+    private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnDevide;
     private javax.swing.JButton btnDoRadian;
     private javax.swing.JButton btnEquals;
@@ -713,6 +805,7 @@ public class CalculatorForm extends javax.swing.JFrame {
     private javax.swing.JButton btnPercentage;
     private javax.swing.JButton btnPlus;
     private javax.swing.JButton btnPow;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnSin;
     private javax.swing.JButton btnSquareRoot;
     private javax.swing.JButton btnSubtract;
@@ -723,5 +816,6 @@ public class CalculatorForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea txtHistory;
     private javax.swing.JTextField txtResult;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }
